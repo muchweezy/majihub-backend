@@ -32,6 +32,8 @@ import {
 
 async function main() {
   console.log('Starting CRUD test...');
+  let seed = Math.random().toString(36).substring(2, 8);
+
 
   const result = await db.transaction(async (tx) => {
     const createdAt = new Date();
@@ -47,7 +49,7 @@ async function main() {
     }).returning();
 
     const [user] = await tx.insert(users).values({
-      employeeId: 'EMP-0001',
+      employeeId: `EMP-0002${seed}`,
       name: 'Jane Doe',
       email: `jane.doe.${Date.now()}@example.com`,
       phone: '+254700000001',
@@ -130,7 +132,7 @@ async function main() {
     }).returning();
 
     const [service] = await tx.insert(services).values({
-      serviceCode: 'SRV-001',
+      serviceCode: `SRV-002${seed}`,
       name: 'Leak Repair',
       nameSw: 'Matengenezo ya uvujaji',
       department: 'Operations',
@@ -144,6 +146,27 @@ async function main() {
       selfServiceEligible: false,
       documentsRequiredJson: ['id', 'proof_of_ownership'],
       tagsJson: ['leak', 'repair'],
+      createdAt,
+      createdAt,
+    }).returning();
+
+    const [serviceNew] = await tx.insert(services).values({
+      serviceCode: `${seed}NCWSC-REC-001`,
+      name: "Reconnection After Disconnection",
+      nameSw: "Ombi la Kuunganishwa Tena Baada ya Kukatwa",
+      department: "Revenue & Collections",
+      description: "Reinstate water supply that was disconnected due to non-payment or violation. Requires outstanding balance settlement and reconnection fee payment before field visit.",
+      module: "Service Request Management",
+      icon: "🔄",
+      status: "active",
+      slaJson: { acknowledgementHours: 4, resolutionHours: 24, escalationHours: 12, priority: "high" },
+      applicationFee: '1500.00',
+      requiresFieldVisit: true,
+      selfServiceEligible: true,
+      documentsRequiredJson: ["Payment receipt for outstanding bill", "Reconnection fee receipt"],
+      tagsJson: ["reconnection", "billing", "revenue"],
+      createdAt,
+      createdAt,
     }).returning();
 
     const [serviceRequest] = await tx.insert(serviceRequests).values({
@@ -166,6 +189,28 @@ async function main() {
       slaBreached: false,
       estimatedCompletion: new Date(Date.now() + 72 * 60 * 60 * 1000),
     }).returning();
+
+    const [serviceRequestNew] = await tx.insert(serviceRequests).values({
+      requestNumber: `SR-${Date.now()}`,
+      serviceId: serviceNew.id,
+      customerId: customer.id,
+      status: 'submitted',
+      priority: 'high',
+      title: 'Water leak at compound',
+      description: 'Visible leak near gate.',
+      zone: 'Zone A',
+      addressJson: { landmark: 'Near school' },
+      submittedAt: createdAt,
+      acknowledgedAt: null,
+      assignedAt: null,
+      resolvedAt: null,
+      closedAt: null,
+      assignedTo: user.id,
+      workOrderId: null,
+      slaBreached: false,
+      estimatedCompletion: new Date(Date.now() + 72 * 60 * 60 * 1000),
+    }).returning();
+
 
     await tx.insert(requestDocuments).values({
       requestId: serviceRequest.id,
@@ -361,7 +406,9 @@ async function main() {
       meter,
       reading,
       service,
+      serviceNew,
       serviceRequest,
+      serviceRequestNew,
       fault,
       workOrder,
       bill,

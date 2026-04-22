@@ -404,6 +404,7 @@ export const services = pgTable('services', {
     selfServiceEligible: boolean('self_service_eligible').notNull().default(false),
     documentsRequiredJson: jsonb('documents_required_json'),
     tagsJson: jsonb('tags_json'),
+    ...timestamps,
 }, (table) => [
     uniqueIndex('services_service_code_unique').on(table.serviceCode),
     index('services_department_idx').on(table.department),

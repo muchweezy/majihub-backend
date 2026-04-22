@@ -8,6 +8,13 @@
       "when": 1776788009528,
       "tag": "0000_safe_skin",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1776846159349,
+      "tag": "0001_material_madripoor",
+      "breakpoints": true
     }
   ]
 }
